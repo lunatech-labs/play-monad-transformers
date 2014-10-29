@@ -1,0 +1,102 @@
+<!-- <html> -->
+<head>
+    <title>Play with Scalaz monad transformers</title>
+</head>
+
+<body>
+
+<div>
+<h2>Deeply nested code</h2>
+
+<p>For comprehensions are a great way to make code easier to read. However,
+they are not so useful when using nested containers. Suppose the we want to
+add two optional values in a <code>Future</code>, then we can not do the following:
+
+<pre><code>val fx: Future[Option[Int]] = ???
+val fy: Future[Option[Int]] = ???
+
+for {
+  x <- fx
+  y <- fy
+} yield x + y</code></pre>
+</p>
+
+<p>This fails, because <code>x</code> and <code>y</code> are not <code>Int</code> but
+<code>Option[Int]</code>, and these can't be added.</p>
+
+<p>
+In this tutorial we'll work towards a solution. More background information can
+be found in <a href="https://speakerdeck.com/eamelink/flatten-your-code">the
+presentation 'Flatten your code'</a> and the
+<a href="https://github.com/eamelink/flatten">accompanying Github project</a>.
+</p>
+</div>
+
+<div>
+<h2>Our sample application</h2>
+
+<p>The sample controller in <a href="#code/app/controllers/Application1.scala" class="shortcut">Application1.scala</a>.
+shows our hypothetical problem domain:</p>
+<ul>
+  <li>Get a username from the query string parameters</li>
+  <li>Lookup the user with that username</li>
+  <li>Validate that user's email address</li>
+  <li>Send the user an email</li>
+</ul>
+
+<p>Each of these steps may fail, and the application must return a proper response code
+and description.</p>
+
+<p>
+The code in <code>Application1.scala</code> is deeply nested. One of the biggest problems of this
+code is that the error handling for a particular method that may fail is often many lines away
+from that method. For example, when <code>getUserName</code> returns a <code>None</code>,
+we deal with that problem at the bottom of the action.</p>
+</p>
+</div>
+
+<div>
+<h2>Monad transformers</h2>
+<p>As-is, we can't easily rewrite this to use a for-comprehension,
+because of the nested containers. But a monad transformer can wrap
+multiple container types and behave as a single container that
+exhibits the behaviours of all wrapped containers.</p>
+
+<p>It's very instructive to write your own monad transformer to get a
+good feeling. For that, see the earlier linked presentation. Here,
+we will be using Scalaz monad transformers.</p>
+
+<p>In the file <a href="#code/app/controllers/Application2.scala">Application2.scala</a>
+we've rewritten our sample application to use the <code>EitherT</code> monad
+transformer.</p>
+
+<p>The <code>|></code> method is just function application, but with the function and
+its parameter reversed. So</p>
+
+<pre><code>foo |> bar |> quux
+</code></pre>
+
+<p>is equivalent to</p>
+
+<pre><code>quux(bar(foo))
+</code></pre>
+
+<p>We use this to neatly line up our code. In all lines in our <code>for-comprehension</code>, the most
+interesting stuff is happening at the left. These are the invocations to the <code>UserService</code>
+in our case. Slightly less interesting (and more to the right) are the errors that we generate
+if the previous method failed. Notice that these errors are much closer to the method that caused them
+than in the previous example.</p>
+
+<p>Downright boring and completely to the right are conversions from various container types
+into the monad transformer that we use.</p>
+</div>
+
+<div>
+<h2>Easier lifting of the containers</h2>
+<p>In <a href="#code/app/controllers/Application3.scala">Application3.scala</a> we've improved
+our code a bit more. We've created an <code>HttpResult</code> object that contain
+many functions to lift a value into our monad transformer. This makes it really
+easy to deal with many types of values.</p>
+</div>
+
+</body>

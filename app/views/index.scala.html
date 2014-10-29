@@ -1,0 +1,35 @@
+@()
+
+@main("Play Monad Transformers Sample App") {
+
+  <p>This is a sample application demonstrating the use of Scalaz Monad Transformers to avoid deeply nested code when dealing with nested containers like `Future[Option[A]]`. More background material can be found in <a href="https://speakerdeck.com/eamelink/flatten-your-code">this presentation</a> and <a href="https://github.com/eamelink/flatten"> the GitHub repo that goes with it</a>.
+
+  <p>The versions below all behave the same.</p>
+  <h3>Version 1</h3>
+  <ul>
+    <li><a href="/v1">No username in the query string</a></li>
+    <li><a href="/v1?username=foo">Unknown username</a></li>
+    <li><a href="/v1?username=sietse">User with invalid email address</a>
+    <li><a href="/v1?username=paco">User with blacklisted email address</a>
+    <li><a href="/v1?username=eamelink">User with everything OK</a>
+  </ul>
+
+  <h3>Version 2</h3>
+  <ul>
+    <li><a href="/v2">No username in the query string</a></li>
+    <li><a href="/v2?username=foo">Unknown username</a></li>
+    <li><a href="/v2?username=sietse">User with invalid email address</a>
+    <li><a href="/v2?username=paco">User with blacklisted email address</a>
+    <li><a href="/v2?username=eamelink">User with everything OK</a>
+  </ul>
+
+    <h3>Version 3</h3>
+  <ul>
+    <li><a href="/v3">No username in the query string</a></li>
+    <li><a href="/v3?username=foo">Unknown username</a></li>
+    <li><a href="/v3?username=sietse">User with invalid email address</a>
+    <li><a href="/v3?username=paco">User with blacklisted email address</a>
+    <li><a href="/v3?username=eamelink">User with everything OK</a>
+  </ul>
+
+}
